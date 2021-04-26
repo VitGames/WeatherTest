@@ -7,5 +7,5 @@
     <item
         android:id="@+id/futureListWeatherFragment"
         android:icon="@drawable/ic_5_days"
-        android:title="5 Days"/>
+        android:title="Forecast"/>
 </menu>

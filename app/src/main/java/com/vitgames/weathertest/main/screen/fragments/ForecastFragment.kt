@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.vitgames.weathertest.R
 
-class FiveDaysFragment : Fragment(R.layout.fragment_five_days) {
+class ForecastFragment : Fragment(R.layout.fragment_five_days) {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -8,6 +8,8 @@ import com.vitgames.weathertest.main.MainActivity
 
 class PermissionManager(private val context: Context) {
 
+    var locationBool: Boolean = false
+
     fun runInternetPermissionDialog(activity: MainActivity) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
@@ -24,6 +26,7 @@ class PermissionManager(private val context: Context) {
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
+
         ) {
             val permissions = arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -32,4 +35,5 @@ class PermissionManager(private val context: Context) {
             ActivityCompat.requestPermissions(activity, permissions, 0)
         }
     }
+
 }
