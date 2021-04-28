@@ -13,7 +13,6 @@ class ForecastFragment : Fragment(R.layout.fragment_five_days) {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_five_days, container, false)
     }
 

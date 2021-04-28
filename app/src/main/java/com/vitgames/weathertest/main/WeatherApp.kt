@@ -18,6 +18,6 @@ class WeatherApp: Application() {
     }
     private val viewModels = module {
         single { PermissionManager(get()) }
-        viewModel {HomeViewModel()}
+        viewModel {HomeViewModel(get())}
     }
 }
