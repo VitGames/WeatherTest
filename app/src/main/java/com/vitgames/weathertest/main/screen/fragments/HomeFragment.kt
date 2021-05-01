@@ -1,55 +1,72 @@
 package com.vitgames.weathertest.main.screen.fragments
 
-import android.content.Intent
 import android.location.Location
 import android.os.Bundle
-import android.provider.Settings
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import com.vitgames.weathertest.R
-import com.vitgames.weathertest.main.MainActivity
 import com.vitgames.weathertest.main.api.ApiWeather
+import com.vitgames.weathertest.main.support.Locator
 import org.koin.android.viewmodel.ext.android.viewModel
 
-
-class HomeFragment : Fragment(R.layout.fragment_home) {
-
-    var api: ApiWeather.ApiInterface? = null
-    var todayWeather: TextView? = null
-
+class HomeFragment() : Fragment(R.layout.fragment_home) {
+    private var location: Location? = null
+    private var api: ApiWeather.ApiInterface? = null
+    private var todayWeather: TextView? = null
+    private var progressBar: ProgressBar? = null
     private val viewModel: HomeViewModel by viewModel()
+
+
+    override fun onResume() {
+        progressBar?.isVisible = false
+        getTodayWeather()
+        super.onResume()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         api = ApiWeather().getClient()?.create(ApiWeather.ApiInterface::class.java)
+        progressBar?.isVisible = false
+        getTodayWeather()
         return inflater.inflate(R.layout.fragment_home, container, false)
-
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         todayWeather = view.findViewById(R.id.weatherToday)
+        progressBar = view.findViewById(R.id.progressBarToday)
+        progressBar?.isVisible = false
         viewModel.progressLiveData.observe(this.viewLifecycleOwner) { success ->
             if (success.not()) {
-                Toast.makeText(requireContext(), "LiveData false", Toast.LENGTH_SHORT).show()
+                progressBar?.isVisible = true
             } else {
+                progressBar?.isVisible = false
                 todayWeather?.text = viewModel.weatherData
             }
         }
         super.onViewCreated(view, savedInstanceState)
     }
 
-
-    fun getWeather(Lat: Double, Lon: Double) {
-        viewModel.weatherResponse(Lat, Lon)
-        todayWeather?.text = viewModel.weatherData
+    private fun getTodayWeather() {
+        Handler().postDelayed(
+            {
+                location = (activity as Locator?)?.getLocationDouble()
+                if (location != null) {
+                    viewModel.weatherResponse(location)
+                } else {
+                    Log.e("LOCATION TODAY", "Location null")
+                }
+            },
+            3000
+        )
     }
 }

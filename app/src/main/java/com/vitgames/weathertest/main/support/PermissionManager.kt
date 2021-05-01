@@ -17,8 +17,7 @@ class PermissionManager(private val context: Context) {
         return if (networkInfo != null && networkInfo.isConnected) {
             true
         } else {
-            Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
             false
         }
     }

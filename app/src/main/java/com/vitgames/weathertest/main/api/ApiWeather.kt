@@ -1,6 +1,5 @@
 package com.vitgames.weathertest.main.api
 
-import com.vitgames.weathertest.main.MainActivity
 import com.vitgames.weathertest.main.models.TodayWeather
 import com.vitgames.weathertest.main.models.WeatherForecast
 import retrofit2.Call

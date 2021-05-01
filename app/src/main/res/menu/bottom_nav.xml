@@ -3,9 +3,11 @@
     <item
         android:id="@+id/currentWeatherFragment"
         android:title="Today"
-        android:icon="@drawable/ic_today"/>
+        android:iconTint="@color/grey"
+        android:icon="@drawable/ic_5_days"/>
     <item
         android:id="@+id/futureListWeatherFragment"
         android:icon="@drawable/ic_5_days"
+        android:iconTint="@color/grey"
         android:title="Forecast"/>
 </menu>
