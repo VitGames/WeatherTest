@@ -1,6 +1,8 @@
 package com.vitgames.weathertest.main.models
 
+import android.annotation.SuppressLint
 import com.google.gson.annotations.SerializedName
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -37,14 +39,8 @@ class TodayWeather {
     @SerializedName("dt")
     private val timestamp: Long = 0
 
-    @SerializedName("dt_txt")
-    private var dt_txt: String? = null
-
-//    //WeatherDay
-//    fun TodayWeather(temp: WeatherTemp?, desctiption: List<WeatherDescription?>?) {
-//        this.temp = temp
-//        this.desctiption = desctiption as List<WeatherDescription>?
-//    }
+//    @SerializedName("dt_txt")
+//    private var dt_txt: String? = null
 
     fun getDate(): Calendar {
         val date: Calendar = Calendar.getInstance()
@@ -93,7 +89,10 @@ class TodayWeather {
         return city
     }
 
+    @SuppressLint("SimpleDateFormat")
     fun getDtTxt(): String? {
-        return dt_txt
+        val date = Date(timestamp * 1000)
+        val format = SimpleDateFormat("HH:mm")
+        return format.format(date)
     }
 }

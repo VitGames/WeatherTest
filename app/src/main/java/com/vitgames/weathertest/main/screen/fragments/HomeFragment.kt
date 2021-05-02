@@ -26,7 +26,6 @@ class HomeFragment() : Fragment(R.layout.fragment_home) {
 
 
     override fun onResume() {
-        progressBar?.isVisible = false
         getTodayWeather()
         super.onResume()
     }
@@ -37,7 +36,6 @@ class HomeFragment() : Fragment(R.layout.fragment_home) {
     ): View? {
         api = ApiWeather().getClient()?.create(ApiWeather.ApiInterface::class.java)
         progressBar?.isVisible = false
-        getTodayWeather()
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 

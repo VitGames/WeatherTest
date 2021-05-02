@@ -12,12 +12,14 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.lifecycle.MutableLiveData
 import com.vitgames.weathertest.R
 import com.vitgames.weathertest.main.api.ApiWeather
 import com.vitgames.weathertest.main.support.Locator
 import org.koin.android.viewmodel.ext.android.viewModel
 
-// TODO check forecastLinear work after reload ForecastFragment
+// TODO forecastLinear observe live data || save in bundle
+// TODO make design coolest
 class ForecastFragment : Fragment(R.layout.fragment_five_days) {
 
     private var location: Location? = null
@@ -37,17 +39,16 @@ class ForecastFragment : Fragment(R.layout.fragment_five_days) {
         savedInstanceState: Bundle?
     ): View? {
         api = ApiWeather().getClient()?.create(ApiWeather.ApiInterface::class.java)
-        getForecastWeather()
         return inflater.inflate(R.layout.fragment_five_days, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         forecastLinear = view.findViewById(R.id.llForecast)
         progressBarForecast = view.findViewById(R.id.progressBarForecast)
-        getForecastWeather()
         viewModel.forecastLiveData.observe(this.viewLifecycleOwner) { success ->
             if (success.not()) {
                 progressBarForecast?.isVisible = true
+                forecastLinear = viewModel.forecastData
             } else {
                 progressBarForecast?.isVisible = false
                 forecastLinear = viewModel.forecastData
@@ -60,13 +61,10 @@ class ForecastFragment : Fragment(R.layout.fragment_five_days) {
         Handler().postDelayed(
             {
                 location = (activity as Locator?)?.getLocationDouble()
-                var lat = location?.latitude
-                var lon = location?.longitude
                 if (location != null) {
                     viewModel.getForecastResponse(location!!, forecastLinear)
                     forecastLinear = viewModel.forecastData
                 } else {
-                    progressBarForecast?.isVisible = false
                     Log.e("LOCATION FORECAST", "Location null")
                 }
             },

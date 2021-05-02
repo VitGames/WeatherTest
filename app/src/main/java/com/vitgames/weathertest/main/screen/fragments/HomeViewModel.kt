@@ -46,8 +46,8 @@ class HomeViewModel(private val context: Context) : CoroutineViewModel() {
                     val data: TodayWeather? = response!!.body()
                     if (response.isSuccessful) {
                         weatherData =
-                            data?.getCity() + " " + data?.getTempWithDegree() + " " + data?.getDescription() + "\n" +
-                                    "Wind: " + data?.getWind() + ".Direction: " + data?.getWindDeg() + "\n" +
+                            data?.getCity() + " " + data?.getTempWithDegree() + " \n " + data?.getDescription() + "\n" +
+                                    "Wind: " + data?.getWind() + "\n" + "Direction: " + data?.getWindDeg() + "\n" +
                                     "Pressure: " + data?.getPressure() + " hPa"
                     }
                 }

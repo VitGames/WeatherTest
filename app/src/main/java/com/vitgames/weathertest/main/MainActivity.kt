@@ -9,13 +9,17 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vitgames.weathertest.R
@@ -31,12 +35,33 @@ class MainActivity : AppCompatActivity(), Locator {
     private val homeFragment = HomeFragment()
     private val forecastFragment = ForecastFragment()
     var currentLocation: Location? = null
+    private var locationRequest: LocationRequest? = null
+    private var locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(p0: LocationResult) {
+            super.onLocationResult(p0)
+            if (p0 == null) {
+                return
+            } else {
+                currentLocation = p0.lastLocation
+                Log.e("LOCATION UPDATE", "Location restored")
+            }
+        }
 
+        override fun onLocationAvailability(p0: LocationAvailability) {
+            super.onLocationAvailability(p0)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopLocationUpdates()
+    }
 
     override fun onResume() {
         permissionManager.checkInternetConnection()
         if (checkLocationEnabled()) {
-            currentLocation = getLocation()
+            //currentLocation = getLocation()
+            startLocationUpdates()
         }
         super.onResume()
     }
@@ -45,9 +70,15 @@ class MainActivity : AppCompatActivity(), Locator {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationRequest = LocationRequest.create()
+        locationRequest?.interval = 4000
+        locationRequest?.fastestInterval = 2000
+        locationRequest?.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         permissionManager.runLocationPermissionDialog(this)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         permissionManager.checkInternetConnection()
         currentLocation = getLocation()
         if (checkLocationEnabled()) {
@@ -69,30 +100,54 @@ class MainActivity : AppCompatActivity(), Locator {
             commit()
         }
 
+    @SuppressLint("MissingPermission")
+    fun startLocationUpdates() {
+        val request: LocationSettingsRequest = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest!!).build()
+        val client: SettingsClient = LocationServices.getSettingsClient(this)
+        val locationSettingsResponseTask: Task<LocationSettingsResponse> =
+            client.checkLocationSettings(request)
+        locationSettingsResponseTask.addOnSuccessListener {
+            fusedLocationClient?.requestLocationUpdates(
+                locationRequest!!,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
+        locationSettingsResponseTask.addOnFailureListener {
+            Log.e("LOCATION UPDATE", "Location null")
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun stopLocationUpdates() {
+        fusedLocationClient?.requestLocationUpdates(
+            locationRequest!!,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
     private fun getLocation(): Location? {
-        if (checkLocationEnabled()) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                permissionManager.runLocationPermissionDialog(this)
-            }
-            fusedLocationClient!!.lastLocation.addOnFailureListener(this) {
-                Toast.makeText(this, "Location error", Toast.LENGTH_SHORT)
-                    .show()
-            }
-            fusedLocationClient!!.lastLocation.addOnSuccessListener { location: Location? ->
-                val listenerLocation: Location? = location
-                if (listenerLocation != null) {
-                    currentLocation = listenerLocation
-                } else {
-                    Toast.makeText(this, "Location null", Toast.LENGTH_SHORT)
-                        .show()
-                }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionManager.runLocationPermissionDialog(this)
+        }
+        fusedLocationClient!!.lastLocation.addOnFailureListener(this) {
+            Toast.makeText(this, "Location error", Toast.LENGTH_SHORT)
+                .show()
+        }
+        fusedLocationClient!!.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                currentLocation = location
+            } else {
+                Log.e("LOCATION START", "Location null")
             }
         }
         return currentLocation
@@ -116,9 +171,14 @@ class MainActivity : AppCompatActivity(), Locator {
             }.show()
     }
 
-     override fun getLocationDouble(): Location? {
+    override fun getLocationDouble(): Location? {
         if (currentLocation == null) {
-            currentLocation = getLocation()
+            Handler().postDelayed(
+                {
+                    startLocationUpdates()
+                },
+                3000
+            )
         }
         return currentLocation
     }

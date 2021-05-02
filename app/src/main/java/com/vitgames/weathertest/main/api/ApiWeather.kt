@@ -8,9 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-//api.openweathermap.org/data/2.5/forecast?lat=${LAT}&lon=${LON}&appid=${API}
+
 class ApiWeather {
-    //WeatherAPI
     private val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 
     private var retrofit: Retrofit? = null
