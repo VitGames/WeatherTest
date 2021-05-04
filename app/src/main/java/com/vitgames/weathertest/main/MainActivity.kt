@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -62,9 +61,9 @@ class MainActivity : AppCompatActivity(), Locator {
 
     override fun onResume() {
         permissionManager.checkInternetConnection()
-        if (checkLocationEnabled()) {
-            startLocationUpdates()
-        }
+//        if (checkLocationEnabled()) {
+           startLocationUpdates()
+//        }
         super.onResume()
     }
 
@@ -107,20 +106,22 @@ class MainActivity : AppCompatActivity(), Locator {
 
     @SuppressLint("MissingPermission")
     fun startLocationUpdates() {
-        val request: LocationSettingsRequest = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest!!).build()
-        val client: SettingsClient = LocationServices.getSettingsClient(this)
-        val locationSettingsResponseTask: Task<LocationSettingsResponse> =
-            client.checkLocationSettings(request)
-        locationSettingsResponseTask.addOnSuccessListener {
-            fusedLocationClient?.requestLocationUpdates(
-                locationRequest!!,
-                locationCallback,
-                Looper.getMainLooper()
-            )
-        }
-        locationSettingsResponseTask.addOnFailureListener {
-            Log.e("LOCATION UPDATE", "Location null")
+        if(checkLocationEnabled()){
+            val request: LocationSettingsRequest = LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest!!).build()
+            val client: SettingsClient = LocationServices.getSettingsClient(this)
+            val locationSettingsResponseTask: Task<LocationSettingsResponse> =
+                client.checkLocationSettings(request)
+            locationSettingsResponseTask.addOnSuccessListener {
+                fusedLocationClient?.requestLocationUpdates(
+                    locationRequest!!,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
+            }
+            locationSettingsResponseTask.addOnFailureListener {
+                Log.e("LOCATION UPDATE", "Location null")
+            }
         }
     }
 
@@ -169,6 +170,8 @@ class MainActivity : AppCompatActivity(), Locator {
             .setMessage("Please, turn on location in settings")
             .setNegativeButton("Open settings") { dialog, _ ->
                 startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }.setPositiveButton("Close"){ dialog, _ ->
+                dialog.cancel()
             }.show()
     }
 

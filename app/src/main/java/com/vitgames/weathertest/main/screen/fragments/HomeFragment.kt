@@ -24,6 +24,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var api: ApiWeather.ApiInterface? = null
     private var todayWeather: TextView? = null
     private var progressBar: ProgressBar? = null
+    private var btnUpdate: ImageView? = null
     private val model: HomeModel by viewModel()
 
 
@@ -44,7 +45,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         todayWeather = view.findViewById(R.id.weatherToday)
         progressBar = view.findViewById(R.id.progressBarToday)
-        val btnUpdate: ImageView = view.findViewById(R.id.btn_update)
+        btnUpdate = view.findViewById(R.id.btn_update)
         progressBar?.isVisible = false
         model.weatherLiveData.observe(this.viewLifecycleOwner) { weather ->
             todayWeather!!.text = weather
@@ -52,9 +53,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         model.progressLiveData.observe(this.viewLifecycleOwner) { success ->
             progressBar?.isVisible = success.not()
         }
-        btnUpdate.setOnClickListener {
+        btnUpdate!!.setOnClickListener {
             getTodayWeather()
-            btnUpdate.animate().setDuration(600).rotationBy(540f).start()
+            btnUpdate!!.animate()!!.setDuration(600)!!.rotationBy(540f).start()
             Toast.makeText(context, "Update..", Toast.LENGTH_SHORT)
                 .show()
         }

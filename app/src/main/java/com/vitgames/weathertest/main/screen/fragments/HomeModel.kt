@@ -1,31 +1,25 @@
 package com.vitgames.weathertest.main.screen.fragments
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.location.Location
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.vitgames.weathertest.main.api.ApiWeather
 import com.vitgames.weathertest.main.models.TodayWeather
-import com.vitgames.weathertest.main.support.CoroutineViewModel
-import com.vitgames.weathertest.main.support.Locator
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.vitgames.weathertest.main.support.CoroutineModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.coroutines.CoroutineContext
 
-class HomeViewModel(private val context: Context) : CoroutineViewModel() {
+class HomeModel(private val context: Context) : CoroutineModel() {
     private val tag: String = "WEATHER"
-    var weatherData: String = ""
+    private var weatherData: String = ""
     private var api: ApiWeather.ApiInterface? = null
     val progressLiveData = MutableLiveData<Boolean>()
+    var weatherLiveData = MutableLiveData<String>()
 
     fun weatherResponse(location: Location?) {
         launch {
@@ -49,6 +43,7 @@ class HomeViewModel(private val context: Context) : CoroutineViewModel() {
                             data?.getCity() + " " + data?.getTempWithDegree() + " \n " + data?.getDescription() + "\n" +
                                     "Wind: " + data?.getWind() + "\n" + "Direction: " + data?.getWindDeg() + "\n" +
                                     "Pressure: " + data?.getPressure() + " hPa"
+                        weatherLiveData.postValue(weatherData)
                     }
                 }
 
