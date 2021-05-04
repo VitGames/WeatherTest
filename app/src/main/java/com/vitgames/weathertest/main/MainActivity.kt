@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), Locator {
     override fun onResume() {
         permissionManager.checkInternetConnection()
 //        if (checkLocationEnabled()) {
-           startLocationUpdates()
+          // startLocationUpdates()
 //        }
         super.onResume()
     }
