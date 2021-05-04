@@ -39,8 +39,6 @@ class TodayWeather {
     @SerializedName("dt")
     private val timestamp: Long = 0
 
-//    @SerializedName("dt_txt")
-//    private var dt_txt: String? = null
 
     fun getDate(): Calendar {
         val date: Calendar = Calendar.getInstance()
@@ -63,22 +61,6 @@ class TodayWeather {
 
     fun getPressure(): Double? {
         return main!!.pressure
-    }
-
-    fun getTemp(): String {
-        return main!!.temp.toString()
-    }
-
-    fun getTempMin(): String {
-        return main!!.temp_min.toString()
-    }
-
-    fun getTempMax(): String {
-        return main!!.temp_max.toString()
-    }
-
-    fun getTempInteger(): String {
-        return main!!.temp!!.toInt().toString()
     }
 
     fun getTempWithDegree(): String {

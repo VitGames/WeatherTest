@@ -4,30 +4,27 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.lifecycle.MutableLiveData
+import androidx.fragment.app.Fragment
 import com.vitgames.weathertest.R
 import com.vitgames.weathertest.main.api.ApiWeather
 import com.vitgames.weathertest.main.support.Locator
 import org.koin.android.viewmodel.ext.android.viewModel
 
-// TODO forecastLinear observe live data || save in bundle
-// TODO make design coolest
 class ForecastFragment : Fragment(R.layout.fragment_five_days) {
 
     private var location: Location? = null
     private var api: ApiWeather.ApiInterface? = null
-    private var forecastLinear: LinearLayout? = null
     private var progressBarForecast: ProgressBar? = null
-
-    private val viewModel: ForecastViewModel by viewModel()
+    private var textForecast: TextView? = null
+    private val model: ForecastModel by viewModel()
 
     override fun onResume() {
         getForecastWeather()
@@ -43,16 +40,21 @@ class ForecastFragment : Fragment(R.layout.fragment_five_days) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        forecastLinear = view.findViewById(R.id.llForecast)
         progressBarForecast = view.findViewById(R.id.progressBarForecast)
-        viewModel.forecastLiveData.observe(this.viewLifecycleOwner) { success ->
-            if (success.not()) {
-                progressBarForecast?.isVisible = true
-                forecastLinear = viewModel.forecastData
-            } else {
-                progressBarForecast?.isVisible = false
-                forecastLinear = viewModel.forecastData
+        val btnUpdateForecast: ImageView = view.findViewById(R.id.btn_updateForecast)
+        textForecast = view.findViewById(R.id.textForecast)
+        getForecastWeather()
+        model.forecastLiveData.observe(this.viewLifecycleOwner) { success ->
+            progressBarForecast?.isVisible = success.not()
+            if (success) {
+                textForecast!!.text = model.forecastData
             }
+        }
+        btnUpdateForecast.setOnClickListener {
+            getForecastWeather()
+            btnUpdateForecast.animate().setDuration(600).rotationBy(540f).start()
+            Toast.makeText(context, "Update..", Toast.LENGTH_SHORT)
+                .show()
         }
         super.onViewCreated(view, savedInstanceState)
     }
@@ -62,13 +64,12 @@ class ForecastFragment : Fragment(R.layout.fragment_five_days) {
             {
                 location = (activity as Locator?)?.getLocationDouble()
                 if (location != null) {
-                    viewModel.getForecastResponse(location!!, forecastLinear)
-                    forecastLinear = viewModel.forecastData
+                    model.getForecastResponse(location)
                 } else {
                     Log.e("LOCATION FORECAST", "Location null")
                 }
             },
-            3000
+            500
         )
     }
 }

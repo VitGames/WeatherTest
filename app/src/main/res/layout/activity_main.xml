@@ -20,13 +20,12 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
-        android:alpha="0.65"
+        android:alpha="0.45"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         app:itemRippleColor="@color/blue"
         app:itemTextColor="@drawable/bottom_nav_item_color"
-        app:menu="@menu/bottom_nav"
-        android:elevation="0dp"/>
+        app:menu="@menu/bottom_nav" />
 
 </RelativeLayout>

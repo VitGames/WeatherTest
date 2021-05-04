@@ -1,9 +1,8 @@
 package com.vitgames.weathertest.main
 
 import android.app.Application
-import com.vitgames.weathertest.main.screen.fragments.ForecastFragment
-import com.vitgames.weathertest.main.screen.fragments.ForecastViewModel
-import com.vitgames.weathertest.main.screen.fragments.HomeViewModel
+import com.vitgames.weathertest.main.screen.fragments.ForecastModel
+import com.vitgames.weathertest.main.screen.fragments.HomeModel
 import com.vitgames.weathertest.main.support.PermissionManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
@@ -20,7 +19,7 @@ class WeatherApp: Application() {
     }
     private val viewModels = module {
         single { PermissionManager(get()) }
-        viewModel {HomeViewModel(get())}
-        viewModel {ForecastViewModel(get())}
+        viewModel {HomeModel(get())}
+        viewModel {ForecastModel(get())}
     }
 }

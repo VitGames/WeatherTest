@@ -38,5 +38,4 @@ class PermissionManager(private val context: Context) {
             ActivityCompat.requestPermissions(activity, permissions, 0)
         }
     }
-
 }

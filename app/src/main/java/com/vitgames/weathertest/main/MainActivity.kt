@@ -13,6 +13,8 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -28,14 +30,14 @@ import com.vitgames.weathertest.main.screen.fragments.HomeFragment
 import com.vitgames.weathertest.main.support.Locator
 import com.vitgames.weathertest.main.support.PermissionManager
 
-//TODO broadcast receiver network & location
 class MainActivity : AppCompatActivity(), Locator {
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private val permissionManager = PermissionManager(this)
     private val homeFragment = HomeFragment()
     private val forecastFragment = ForecastFragment()
-    var currentLocation: Location? = null
+    private var currentLocation: Location? = null
     private var locationRequest: LocationRequest? = null
+
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
             super.onLocationResult(p0)
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity(), Locator {
             } else {
                 currentLocation = p0.lastLocation
                 Log.e("LOCATION UPDATE", "Location restored")
+                stopLocationUpdates()
             }
         }
 
@@ -60,7 +63,6 @@ class MainActivity : AppCompatActivity(), Locator {
     override fun onResume() {
         permissionManager.checkInternetConnection()
         if (checkLocationEnabled()) {
-            //currentLocation = getLocation()
             startLocationUpdates()
         }
         super.onResume()
@@ -69,14 +71,17 @@ class MainActivity : AppCompatActivity(), Locator {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         setContentView(R.layout.activity_main)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
         locationRequest = LocationRequest.create()
-        locationRequest?.interval = 4000
-        locationRequest?.fastestInterval = 2000
+        locationRequest?.interval = 8000
+        locationRequest?.fastestInterval = 4000
         locationRequest?.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         permissionManager.runLocationPermissionDialog(this)
         permissionManager.checkInternetConnection()
@@ -121,11 +126,7 @@ class MainActivity : AppCompatActivity(), Locator {
 
     @SuppressLint("MissingPermission")
     fun stopLocationUpdates() {
-        fusedLocationClient?.requestLocationUpdates(
-            locationRequest!!,
-            locationCallback,
-            Looper.getMainLooper()
-        )
+        fusedLocationClient?.removeLocationUpdates(locationCallback)
     }
 
     private fun getLocation(): Location? {
@@ -177,7 +178,7 @@ class MainActivity : AppCompatActivity(), Locator {
                 {
                     startLocationUpdates()
                 },
-                3000
+                1000
             )
         }
         return currentLocation

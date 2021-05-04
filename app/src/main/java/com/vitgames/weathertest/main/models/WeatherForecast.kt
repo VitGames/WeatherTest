@@ -9,5 +9,4 @@ class WeatherForecast {
     fun getItems(): List<TodayWeather>? {
         return items
     }
-
 }
